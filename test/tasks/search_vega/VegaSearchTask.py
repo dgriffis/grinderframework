@@ -63,12 +63,11 @@ class VegaSearchTask(Task):
         return query
     
     def buildArgs(self, argString):
-        
-        #argString = "practiceAreaIDs:A:1,1,1,1,1,2,2,2,2,2,3,3,3,3,3,5,5,5,5,5,6,6,6,6,6,7,7,7,7,7,8,8,8,8,8,10,10,10,10,10|glgNewsPracticeAreaIDs:A:|includeFullBio:B:true|excludeTaxonomy:B:false|councilMemberLimit:I:2|disableTickerExpansion:B:true|onCallUpperRate:I:0|contactListQuery:B:false|KPQTypesFilter:S:clinical investigator\linvestigate active clinical trials\lsteering committee of PRODUCT\lsteering committee or DSMB|userContactID:I:47573|sortCriteria:I:0|suppressSecResults:B:true|queryBuilder:S:|kp_person_id:I:0|userPersonID:I:253413|isMSPClient:B:true|track:S:d1ebe787-81db-41da-8ac6-79e0252ce291|userGroupIDs:A:|userFirmID:I:4823|glgiPracticeAreaIDs:A:|eventPracticeAreaIDs:A:|pqLimit:I:9|debugFlags:I:0|KPQAging:I:90|includeDNC:B:false"
-        
+       
         #log("argString is : %s" % argString)
         args={}
-        practiceAreaIDs=[]
+        searchArIDs=[]
+        
         argKeyValues = argString.split('|')  #should look like key:type:value
         for nameKeys in argKeyValues :
             #log("value string is %s " % nameKeys)
@@ -79,8 +78,8 @@ class VegaSearchTask(Task):
                 valAr=namekeyVals[2].split(',')
                 for valArVals in valAr :
                     if valArVals != '' :
-                        practiceAreaIDs.append(int(valArVals))
-                        args[namekeyVals[0]]=practiceAreaIDs
+                        searchArIDs.append(int(valArVals))
+                        args[namekeyVals[0]]=searchArIDs
             elif namekeyVals[1]== 'B' :
                 if namekeyVals[2] == "true":
                     args[namekeyVals[0]]= True
