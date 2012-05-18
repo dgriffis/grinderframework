@@ -40,7 +40,7 @@ class VegaSearchTask(Task):
             }
    
     def getProxy(self, url):
-        #log("in getProxy with url: %s" % url)
+        log("in getProxy with url: %s" % url)
         try:
             s = ServerProxy(url)
             #log("have my Proxy")  
@@ -96,7 +96,7 @@ class VegaSearchTask(Task):
                  
             s = self.getProxy(url=self.urlDict["url0"])
             query = self.getQuery()
-            #log("searchFilter is : %s" % query)
+            log("searchFilter is : %s" % query)
             
             #query = """"Name:uchino",vega,[16],0,30,0,{'searchUserId':163,'consultCutoff':365},{}"""
             #query = """"healthcare claims",vega,[16],0,30,0,{'searchUserId':163,'consultCutoff':365},{}"""

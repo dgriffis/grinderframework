@@ -6,7 +6,8 @@ import random
 #  Make a new scenario
 #
 
-myScenario = Scenario(("Vega Search"), {"url0":"http://10.143.1.7:9008/xmlrpc"});
+#myScenario = Scenario(("Vega Search"), {"url0":"http://search.glgqashared.com:9999/xmlrpc"});
+myScenario = Scenario(("Vega Search"), {"url0":"http://10.45.206.72:9002/xmlrpc"});
 searchTask = VegaSearchTask.VegaSearchTask()
 
 searchFilters = []
