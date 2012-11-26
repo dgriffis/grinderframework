@@ -4,7 +4,7 @@ from test.framework.Task import Task
 
 
 from net.grinder.script import Test
-from net.grinder.common import Logger
+#from net.grinder.common import Logger
 from net.grinder.script.Grinder import grinder
 
 import sys
@@ -14,7 +14,7 @@ from xml.dom.minidom import parseString
 
 def log(message):
     """Log to the console, the message will include the thread ID"""
-    grinder.logger.output(message, Logger.TERMINAL)
+    grinder.logger.info(message)
     
 
 class VegaSearchTask(Task):
