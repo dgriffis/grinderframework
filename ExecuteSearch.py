@@ -1,13 +1,14 @@
+from net.grinder.script.Grinder import grinder
 from test.framework.Scenario import Scenario
 from test.tasks.search_vega import VegaSearchTask
-import random
+#import random
 
 #
 #  Make a new scenario
 #
 
 #myScenario = Scenario(("Vega Search"), {"url0":"http://search.glgqashared.com:9999/xmlrpc"});
-myScenario = Scenario(("Vega Search"), {"url0":"http://10.45.206.72:9002/xmlrpc"});
+myScenario = Scenario(("Vega Search"), {"url0":"http://10.45.206.106:9002/xmlrpc"});
 searchTask = VegaSearchTask.VegaSearchTask()
 
 searchFilters = []
@@ -26,9 +27,9 @@ setattr(searchTask, "searchFilters", searchFilters)
 
 def parameterizeSearch(self=searchTask):
     #print "in parameterizeSearch"
-    index = random.randrange(0,lineCount)
+    #index = random.randrange(0,lineCount)
     #print "index is %d" % index
-    searchFilter = self.searchFilters[index];
+    searchFilter = self.searchFilters[self.index];
     #print "search Filter is %s" % searchFilter;
     #queryString = searchFilter["query"];
     #print "query string is %s" % queryString;
@@ -41,5 +42,8 @@ myScenario.addTask(searchTask)
 
 
 class TestRunner:
+    def __init__(self):
+        grinder.properties["grinder.runs"] = str(len(searchFilters))
+        
     def __call__(self):
         myScenario.run()

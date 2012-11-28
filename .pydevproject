@@ -9,6 +9,5 @@
 </pydev_pathproperty>
 <pydev_pathproperty name="org.python.pydev.PROJECT_EXTERNAL_SOURCE_PATH">
 <path>/Users/dgriffis/grinder/lib/grinder.jar</path>
-<path>/Users/dgriffis/grinder/lib/logback-core-1.0.0.jar</path>
 </pydev_pathproperty>
 </pydev_project>

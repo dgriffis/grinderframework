@@ -1,10 +1,7 @@
 #!/usr/bin/python
 
 from test.framework.Task import Task
-
-
 from net.grinder.script import Test
-#from net.grinder.common import Logger
 from net.grinder.script.Grinder import grinder
 
 import sys
@@ -19,14 +16,14 @@ def log(message):
 
 class VegaSearchTask(Task):
 
-     
     def __init__(self):
         """Initialize properties of class"""
         Task.__init__(self)
         self.description = "Run a Vega Search"
         self.urlDict = {}
         self.taskId = Task.numberOfTasks
-
+        self.index = 0
+        self.testRun = ""
 
     def initializeTask(self):
         """Initializes Instance Variables for this class. This method will be called by the Scenario object that this task belongs to."""
@@ -38,12 +35,23 @@ class VegaSearchTask(Task):
             { "appQuery":
                 {"query":"myQuery"}
             }
-   
+
+    def writeToFile(self, text):
+        filename = "%s-%d-page.xml" % ("xmlrpcSearch",                                      
+                                       grinder.runNumber)
+        
+        try:        
+            myFile = open(".//compare//"+filename, "w")
+            s = text.encode('utf-8')
+            print >> myFile, s
+            myFile.close()
+        except Exception, err:
+            sys.stderr.write('ERROR: %s\n' % str(err))  
+            
     def getProxy(self, url):
-        log("in getProxy with url: %s" % url)
+        #log("in getProxy with url: %s" % url)
         try:
-            s = ServerProxy(url)
-            #log("have my Proxy")  
+            s = Test(self.index, "xmlrpc search").wrap(ServerProxy(url))
         except:
             print "Service returned an error:", sys.exc_info()[0]
            
@@ -94,7 +102,6 @@ class VegaSearchTask(Task):
         #log("in postQuery")
         try:
                  
-            s = self.getProxy(url=self.urlDict["url0"])
             query = self.getQuery()
             log("searchFilter is : %s" % query)
             
@@ -102,13 +109,13 @@ class VegaSearchTask(Task):
             #query = """"healthcare claims",vega,[16],0,30,0,{'searchUserId':163,'consultCutoff':365},{}"""
             paramArr=[]
             paramArr = query.split('\t')
-            
             args = self.buildArgs(paramArr[2])
            
-
-            s.SimpleSearch.execute(paramArr[1],paramArr[0],[16],0,30,0,args,{})
-       
+            testRun = self.getProxy(url=self.urlDict["url0"])
+            result = testRun.SimpleSearch.execute(paramArr[1],paramArr[0],[16],0,30,0,args,{})
             
+            self.writeToFile(result)
+            self.index+=1
         except:
             print "Service returned an error:", sys.exc_info()[0]
             
