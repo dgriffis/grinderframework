@@ -11,11 +11,7 @@ from test.tasks.search_vega import VegaSearchTask
 myScenario = Scenario(("Vega Search"), {"url0":"http://10.45.206.106:9002/xmlrpc"});
 searchTask = VegaSearchTask.VegaSearchTask()
 
-searchFilters = []
-lineCount = 0
-for line in file('searchQueries.csv'):
-    searchFilters.append(line.strip())
-    lineCount+=1
+searchFilters = [ line.strip() for line in file('searchQueries.csv') ]
 
 #searchFilters = [{"query":"\"nuclear\",\"vega\",[16], 0, 20, 0, {}, {}"},
 #                {"query":"\"Name:uchino\",\"vega\",[16],0,30,0,{},{}"},
