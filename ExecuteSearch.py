@@ -1,6 +1,9 @@
 from net.grinder.script.Grinder import grinder
 from test.framework.Scenario import Scenario
 from test.tasks.search_vega import VegaSearchTask
+from splunkConnect import splunkSearch
+from settings import getKeyValue
+
 #import random
 
 #
@@ -9,9 +12,14 @@ from test.tasks.search_vega import VegaSearchTask
 
 #myScenario = Scenario(("Vega Search"), {"url0":"http://search.glgqashared.com:9999/xmlrpc"});
 myScenario = Scenario(("Vega Search"), {"url0":"http://10.45.206.106:9002/xmlrpc"});
+
 searchTask = VegaSearchTask.VegaSearchTask()
 
-searchFilters = [ line.strip() for line in file('searchQueries.csv') ]
+# Connect to splunk and get last 24 hours of queries
+searchFilters = splunkSearch( )
+
+#The following lines builds an array from project csv
+#searchFilters = [ line.strip() for line in file('searchQueries.csv') ]
 
 #searchFilters = [{"query":"\"nuclear\",\"vega\",[16], 0, 20, 0, {}, {}"},
 #                {"query":"\"Name:uchino\",\"vega\",[16],0,30,0,{},{}"},

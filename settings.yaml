@@ -1,0 +1,11 @@
+---
+  splunk:
+    - username: svcSplunkUser
+    - password: GLGroup987
+    - earliest_time: 2012-11-28T00:00:00-0000
+    - latest_time: 2012-11-28T23:59:00-0000
+    - num_results: 5000
+    - search_query: search host="txsearch*" source="D:\\LogFiles\\searcher\\querylog.log"
+    - splunk_host: splunk-api.glgint.net
+  xmlrpc:
+    - url: http://10.20.41.77:8080/solr/mosaic-ngrams/mosaicsearch/?
