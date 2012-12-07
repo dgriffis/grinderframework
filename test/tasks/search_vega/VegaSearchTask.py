@@ -3,6 +3,7 @@
 from test.framework.Task import Task
 from net.grinder.script import Test
 from net.grinder.script.Grinder import grinder
+from UserDict import UserDict
 
 import sys
 
@@ -12,7 +13,41 @@ from xml.dom.minidom import parseString
 def log(message):
     """Log to the console, the message will include the thread ID"""
     grinder.logger.info(message)
-    
+
+DATE = 0
+RESULT = 1
+ELAPSED = 2
+XML_SIZE = 3
+APP_ID = 4
+TOTAL_RESULTS = 5
+QUERY = 6
+START_INDEX = 7
+MAX_RESULTS = 8
+SORT_ORDER = 9
+OBJECT_TYPES = 10
+NAMED_ARGUMENTS = 11
+
+def toIntArray(s):
+    if len(s) > 0:
+        return [int(x) for x in s.split(',')]
+    else:
+        return None
+
+def toInt(s):
+    if len(s) > 0:
+        return int(s)
+    else:
+        return None
+
+def toBoolean(s):
+    if s == '' or s == 'false':
+        return False
+    else:
+        return True
+
+def toString(s):
+    return s
+
 
 class VegaSearchTask(Task):
 
@@ -24,6 +59,7 @@ class VegaSearchTask(Task):
         self.taskId = Task.numberOfTasks
         self.index = 0
         self.testRun = ""
+        self.nFaults = 0
 
     def initializeTask(self):
         """Initializes Instance Variables for this class. This method will be called by the Scenario object that this task belongs to."""
@@ -36,12 +72,18 @@ class VegaSearchTask(Task):
                 {"query":"myQuery"}
             }
 
+
     def writeToFile(self, text):
         filename = "%s-%d-page.xml" % ("xmlrpcSearch",                                      
                                        grinder.runNumber)
-        
+        logDir = grinder.properties["grinder.logDirectory"]
+        hostID = grinder.properties["grinder.hostID"]
+        targetFile = logDir+"/"+hostID+"/"+filename
+        if hostID == "eclipse":
+            return        
+        #print "Log folder and filename is %s" % logDir+"/"+hostID+"/"+filename
         try:        
-            myFile = open(".//compare//"+filename, "w")
+            myFile = open(targetFile, "w")
             s = text.encode('utf-8')
             print >> myFile, s
             myFile.close()
@@ -51,7 +93,7 @@ class VegaSearchTask(Task):
     def getProxy(self, url):
         #log("in getProxy with url: %s" % url)
         try:
-            s = Test(self.index, "xmlrpc search").wrap(ServerProxy(url))
+            s = Test(self.index, "xmlrpc search").wrap(ServerProxy(url, None, "ISO-8859-1"))
         except:
             print "Service returned an error:", sys.exc_info()[0]
            
@@ -72,13 +114,13 @@ class VegaSearchTask(Task):
     
     def buildArgs(self, argString):
        
-        #log("argString is : %s" % argString)
         args={}
         searchArIDs=[]
+        #print "argString is %s" % argString
         
         argKeyValues = argString.split('|')  #should look like key:type:value
         for nameKeys in argKeyValues :
-            #log("value string is %s " % nameKeys)
+            #print "value string is %s " % nameKeys
             namekeyVals = nameKeys.split(':')
             if namekeyVals[1]== 'I' :
                 args[namekeyVals[0]]= int(namekeyVals[2])
@@ -95,28 +137,59 @@ class VegaSearchTask(Task):
                     args[namekeyVals[0]]= False    
             else:
                 args[namekeyVals[0]]= namekeyVals[2]
-          
+                
+        #print "returning from buildArgs"  
         return args
             
     def run(self):
-        #log("in postQuery")
+        #print "in postQuery"
         try:
-                 
-            query = self.getQuery()
-            log("searchFilter is : %s" % query)
+                   
+            myterm = self.getQuery()  
+            query = myterm["_raw"]   
+            #log("VegaSearchTask query is : %s" % query)     
+            #print "searchFilter is : %s" % query
+
+            parts = query.strip().split("\t")
+            if len(parts) < 3:
+                self.index+=1
+                return
             
-            #query = """"Name:uchino",vega,[16],0,30,0,{'searchUserId':163,'consultCutoff':365},{}"""
-            #query = """"healthcare claims",vega,[16],0,30,0,{'searchUserId':163,'consultCutoff':365},{}"""
-            paramArr=[]
-            paramArr = query.split('\t')
-            args = self.buildArgs(paramArr[2])
-           
+            #print '* DATE' + parts[DATE]
+            #print '* RESULT' + parts[RESULT]
+            #print '* ELAPSED' + parts[ELAPSED]
+            #print '* XML_SIZE' + parts[XML_SIZE]
+            #print '* APP_ID' + parts[APP_ID]
+            #print '* TOTAL_RESULTS' + parts[TOTAL_RESULTS]
+            #print '* QUERY' + parts[QUERY]
+            #print '* START_INDEX' + parts[START_INDEX]
+            #print '* MAX_RESULTS' + parts[MAX_RESULTS]
+            #print '* SORT_ORDER' + parts[SORT_ORDER]
+            #print '* OBJECT_TYPES' + parts[OBJECT_TYPES]
+            #print '* NAMED_ARGUMENTS' + parts[NAMED_ARGUMENTS]
+  
+            if parts[QUERY] == "Technology glgkeynote" or parts[QUERY] == "technology" or parts[APP_ID] == "IndexSwitch":
+                self.index+=1
+                return
+ 
+            namedArgs = self.buildArgs(parts[NAMED_ARGUMENTS])
+
             testRun = self.getProxy(url=self.urlDict["url0"])
-            result = testRun.SimpleSearch.execute(paramArr[1],paramArr[0],[16],0,30,0,args,{})
+            result = testRun.SimpleSearch.execute(parts[QUERY],
+                                parts[APP_ID],
+                                toIntArray(parts[OBJECT_TYPES].strip()),
+                                int(parts[START_INDEX]),
+                                int(parts[MAX_RESULTS]),
+                                int(parts[SORT_ORDER]),
+                                namedArgs,
+                                {})
+
             
             self.writeToFile(result)
             self.index+=1
         except:
             print "Service returned an error:", sys.exc_info()[0]
-            
+            log("fault on query %d with raw string of %s : " % ( self.index, query ))
+            self.nFaults+=1
+            self.index+=1
 
