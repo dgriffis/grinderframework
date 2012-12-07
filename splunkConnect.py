@@ -16,13 +16,18 @@ my_count = getKeyValue("splunk", "num_results")
 my_search = getKeyValue("splunk", "search_query")
 #print my_search
            
-def splunkSearch():
+def splunkSearch(hostID):
     
     service = splunkConnect()
     
     oneshotSearchArgs = Args.create()
-    oneshotSearchArgs.put("earliest_time", my_earliest_time)
-    oneshotSearchArgs.put("latest_time",   my_latest_time)
+    print "value for hostID is %s" % hostID
+    if hostID == "nightlyTrend":
+        oneshotSearchArgs.put("earliest_time", "-24h@h")
+        oneshotSearchArgs.put("latest_time",   "now")
+    else:      
+        oneshotSearchArgs.put("earliest_time", my_earliest_time)
+        oneshotSearchArgs.put("latest_time",   my_latest_time)
     oneshotSearchArgs.put("output_mode", "xml")
     oneshotSearchArgs.put("count", my_count)
     oneshotSearchQuery = my_search

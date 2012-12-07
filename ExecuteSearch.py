@@ -14,7 +14,7 @@ myScenario = Scenario(("Vega Search"), {"url0":xmlrpc_search_url});
 searchTask = VegaSearchTask.VegaSearchTask()
 
 # Connect to splunk and get last 24 hours of queries
-searchFilters = splunkSearch( )
+searchFilters = splunkSearch( grinder.properties["grinder.hostID"] )
 
 #The following lines builds an array from project csv
 #searchFilters = [ line.strip() for line in file('searchQueries.csv') ]
