@@ -6,12 +6,10 @@ from settings import getKeyValue
 
 #import random
 
-#
+xmlrpc_search_url = getKeyValue("xmlrpc", "url")
 #  Make a new scenario
 #
-
-#myScenario = Scenario(("Vega Search"), {"url0":"http://search.glgqashared.com:9999/xmlrpc"});
-myScenario = Scenario(("Vega Search"), {"url0":"http://10.45.206.106:9002/xmlrpc"});
+myScenario = Scenario(("Vega Search"), {"url0":xmlrpc_search_url});
 
 searchTask = VegaSearchTask.VegaSearchTask()
 
