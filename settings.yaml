@@ -8,4 +8,5 @@
     - search_query: search host="txsearch*" source="D:\\LogFiles\\searcher\\querylog.log"
     - splunk_host: splunk-api.glgint.net
   xmlrpc:
-    - url: http://10.45.206.106:9002/xmlrpc
+    - url0: http://10.45.206.106:9002/xmlrpc
+    - url1: http://search.glgint.net:9999/xmlrpc

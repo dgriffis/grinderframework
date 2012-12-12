@@ -5,8 +5,11 @@ from splunkConnect import splunkSearch
 from settings import getKeyValue
 
 #import random
-
-xmlrpc_search_url = getKeyValue("xmlrpc", "url")
+hostID = grinder.properties["grinder.hostID"]
+if hostID == "nightlyTrend":
+    xmlrpc_search_url = getKeyValue("xmlrpc", "url1")
+else:
+    xmlrpc_search_url = getKeyValue("xmlrpc", "url0")
 #  Make a new scenario
 #
 myScenario = Scenario(("Vega Search"), {"url0":xmlrpc_search_url});
@@ -14,7 +17,7 @@ myScenario = Scenario(("Vega Search"), {"url0":xmlrpc_search_url});
 searchTask = VegaSearchTask.VegaSearchTask()
 
 # Connect to splunk and get last 24 hours of queries
-searchFilters = splunkSearch( grinder.properties["grinder.hostID"] )
+searchFilters = splunkSearch( grinder.properties[hostID] )
 
 #The following lines builds an array from project csv
 #searchFilters = [ line.strip() for line in file('searchQueries.csv') ]

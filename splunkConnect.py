@@ -21,9 +21,9 @@ def splunkSearch(hostID):
     service = splunkConnect()
     
     oneshotSearchArgs = Args.create()
-    print "value for hostID is %s" % hostID
+    #print "value for hostID is %s" % hostID
     if hostID == "nightlyTrend":
-        oneshotSearchArgs.put("earliest_time", "-24h@h")
+        oneshotSearchArgs.put("earliest_time", "-23h@h")
         oneshotSearchArgs.put("latest_time",   "now")
     else:      
         oneshotSearchArgs.put("earliest_time", my_earliest_time)
