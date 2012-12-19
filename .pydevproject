@@ -9,5 +9,8 @@
 </pydev_pathproperty>
 <pydev_pathproperty name="org.python.pydev.PROJECT_EXTERNAL_SOURCE_PATH">
 <path>/Users/dgriffis/grinder/lib/grinder.jar</path>
+<path>/Users/dgriffis/splunk/dist/splunk-external.jar</path>
+<path>/Users/dgriffis/splunk/dist/splunk-sdk.jar</path>
+<path>/Users/dgriffis/splunk/dist/splunk.jar</path>
 </pydev_pathproperty>
 </pydev_project>
