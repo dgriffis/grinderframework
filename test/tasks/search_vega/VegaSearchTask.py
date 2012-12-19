@@ -60,6 +60,11 @@ class VegaSearchTask(Task):
         self.index = 0
         self.testRun = ""
         self.nFaults = 0
+        self.hostID = grinder.properties["grinder.hostID"]
+        if self.hostID == "nightlyTrend":
+            logDir = grinder.properties["grinder.logDirectory"]
+            targetFile = logDir+"/query.txt"
+            self.myQueryFile = open(targetFile, "w")
 
     def initializeTask(self):
         """Initializes Instance Variables for this class. This method will be called by the Scenario object that this task belongs to."""
@@ -72,14 +77,12 @@ class VegaSearchTask(Task):
                 {"query":"myQuery"}
             }
 
-
     def writeToFile(self, text):
         filename = "%s-%d-page.xml" % ("xmlrpcSearch",                                      
                                        grinder.runNumber)
         logDir = grinder.properties["grinder.logDirectory"]
-        hostID = grinder.properties["grinder.hostID"]
-        targetFile = logDir+"/"+hostID+"/"+filename
-        if hostID == "eclipse":
+        targetFile = logDir+"/"+self.hostID+"/"+filename
+        if self.hostID == "eclipse":
             return        
         #print "Log folder and filename is %s" % logDir+"/"+hostID+"/"+filename
         try:        
@@ -89,11 +92,17 @@ class VegaSearchTask(Task):
             myFile.close()
         except Exception, err:
             sys.stderr.write('ERROR: %s\n' % str(err))  
-            
+  
+    def writeSavedQuery(self, query):
+        try:        
+            print >> self.myQueryFile, query
+        except Exception, err:
+            sys.stderr.write('ERROR: %s\n' % str(err))        
+                    
     def getProxy(self, url):
         #log("in getProxy with url: %s" % url)
         try:
-            s = Test(self.index, "xmlrpc search").wrap(ServerProxy(url, None, "ISO-8859-1"))
+            s = Test(self.index, "xmlrpc search").wrap(ServerProxy(url, None))
         except:
             print "Service returned an error:", sys.exc_info()[0]
            
@@ -144,16 +153,32 @@ class VegaSearchTask(Task):
     def run(self):
         #print "in postQuery"
         try:
-                   
-            myterm = self.getQuery()  
-            query = myterm["_raw"]   
-            #log("VegaSearchTask query is : %s" % query)     
+            
+            myterm = self.getQuery() 
+            if self.hostID == "nightlyTrend":       
+                lines = myterm["_raw"]
+                """ term may contain multiple queries - we just want 1 """
+                query = lines.split("\n")[0]
+            else:
+                query = myterm
+            #print "The length after raw of lines is %d" % len(lines)   
+            #print "VegaSearchTask query is : %s" % query     
             #print "searchFilter is : %s" % query
 
             parts = query.strip().split("\t")
             if len(parts) < 3:
                 self.index+=1
                 return
+        
+            if "glgkeynote" in parts[QUERY].decode('utf-8').lower() or parts[QUERY].decode('utf-8').lower() == "technology" or parts[APP_ID] == "IndexSwitch":
+                self.index+=1
+                return
+            
+            if self.hostID == "nightlyTrend":
+                self.writeSavedQuery(query)
+             
+            namedArgs = self.buildArgs(parts[NAMED_ARGUMENTS])
+            testRun = self.getProxy(url=self.urlDict["url0"])
             
             #print '* DATE' + parts[DATE]
             #print '* RESULT' + parts[RESULT]
@@ -167,19 +192,12 @@ class VegaSearchTask(Task):
             #print '* SORT_ORDER' + parts[SORT_ORDER]
             #print '* OBJECT_TYPES' + parts[OBJECT_TYPES]
             #print '* NAMED_ARGUMENTS' + parts[NAMED_ARGUMENTS]
-  
-            if parts[QUERY] == "Technology glgkeynote" or parts[QUERY] == "technology" or parts[APP_ID] == "IndexSwitch":
-                self.index+=1
-                return
- 
-            namedArgs = self.buildArgs(parts[NAMED_ARGUMENTS])
-
-            testRun = self.getProxy(url=self.urlDict["url0"])
+                        
             result = testRun.SimpleSearch.execute(parts[QUERY],
                                 parts[APP_ID],
                                 toIntArray(parts[OBJECT_TYPES].strip()),
-                                int(parts[START_INDEX]),
-                                int(parts[MAX_RESULTS]),
+                                0,
+                                100,
                                 int(parts[SORT_ORDER]),
                                 namedArgs,
                                 {})
