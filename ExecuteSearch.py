@@ -4,31 +4,26 @@ from test.tasks.search_vega import VegaSearchTask
 from splunkConnect import splunkSearch
 from settings import getKeyValue
 
-#import random
 hostID = grinder.properties["grinder.hostID"]
 if hostID == "nightlyTrend":
     xmlrpc_search_url = getKeyValue("xmlrpc", "url1")
 else:
     xmlrpc_search_url = getKeyValue("xmlrpc", "url0")
-#  Make a new scenario
-#
-myScenario = Scenario(("Vega Search"), {"url0":xmlrpc_search_url});
 
+""" Make a new scenario """
+myScenario = Scenario(("Vega Search"), {"url0":xmlrpc_search_url});
 searchTask = VegaSearchTask.VegaSearchTask()
 
-# Connect to splunk and get last 24 hours of queries
-searchFilters = splunkSearch( grinder.properties[hostID] )
-
-#The following lines builds an array from project csv
-#searchFilters = [ line.strip() for line in file('searchQueries.csv') ]
-
-#searchFilters = [{"query":"\"nuclear\",\"vega\",[16], 0, 20, 0, {}, {}"},
-#                {"query":"\"Name:uchino\",\"vega\",[16],0,30,0,{},{}"},
-#                {"query":"Name:uchino,vega,[16],0,30,0,{'searchUserId':163,'consultCutoff':365},{}"}]
+if hostID == "nightlyTrend":
+    """ Connect to splunk and get last 24 hours of queries """
+    searchFilters = splunkSearch( hostID )
+else:
+    """ Retrieve queries from the nightlyTrend saved query file """
+    logDir = grinder.properties["grinder.logDirectory"]
+    searchFilters = [ line.strip() for line in file(logDir+"/query.txt") ]
                  
 setattr(searchTask, "searchFilters", searchFilters)
 
-#print "Total lines is %d" % lineCount
 
 def parameterizeSearch(self=searchTask):
     #print "in parameterizeSearch"

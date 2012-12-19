@@ -49,7 +49,8 @@ def splunkResults(stream):
     except Exception, err:
         sys.stderr.write('ERROR: %s\n' % str(err))
         return 1
-    
+       
+    print "Retrieving data from splunk"
     searchFilters = []
     while True:
         try:
@@ -61,6 +62,8 @@ def splunkResults(stream):
             break
         
     reader.close()
+ 
+    print "Splunk reader closed"   
     
     return searchFilters    
         
