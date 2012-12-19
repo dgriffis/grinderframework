@@ -110,12 +110,16 @@ def _buildScenarios():
 
     for r,d,f in os.walk(beforeFolder):
         for myFile in f:
-            scenario.append( (myFile, dict(param=myFile) ))
+            scenarioName = "scenario_"+myFile[:-4]
+            scenario.append( (scenarioName, dict(param=myFile) ))
 
     return scenario   
  
 class Test(TestWithScenarios):
-    
+    ''' 
+      subclass of TestWithScenarios allows display of the unittest testSpearmanCoefficient()
+      with the filename of the file being tested in Jenkins.
+    '''  
     ranks1 = []
     ranks2 = []
     scenarios = _buildScenarios()   
