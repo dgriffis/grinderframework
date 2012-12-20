@@ -2,13 +2,31 @@
 
 if [ $# -eq 0 ]
 then
-    hostID="nightlyTrend"
-elif [ $1 = "before" ]
-then
-    hostID="before"
- else
-    hostID="after"
+    echo "Usage : $0 runtype[prodNightly,prodDeploy,devNightly,devDeploy]"
+    exit
 fi
+
+
+case "$1" in
+
+'prodNightly')  echo "Nightly prod trending"
+hostID="prodNightly"
+;;
+'prodDeploy')  echo  "Deploy prod"
+hostID="prodDeploy"
+;;
+'devNightly')  echo  "Nightly development trending"
+hostID="devNightly"
+;;
+'devDeploy') echo  "Deploy development"
+hostID="devDeploy"
+;;
+*) echo "Default: Nightly prod trending"
+hostID="prodNightly"
+;;
+esac
+
+
 
 echo "Deleteing test output files"
 pushd log/$hostID

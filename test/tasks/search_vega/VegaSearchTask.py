@@ -169,7 +169,6 @@ class VegaSearchTask(Task):
                 query = myterm
             #print "The length after raw of lines is %d" % len(lines)   
             #print "VegaSearchTask query is : %s" % query     
-            #print "searchFilter is : %s" % query
 
             parts = query.strip().split("\t")
             if len(parts) < 3:
@@ -205,8 +204,8 @@ class VegaSearchTask(Task):
                                 namedArgs,
                                 {})
 
-            '''For now - a run other than a nightly will execute queries from the saved query file'''
-            if self.hostID == "nightlyTrend":
+            '''runs other than a nightlyTrend will execute queries from the saved query file - create the file here'''
+            if self.hostID == "prodNightly":
                 self.writeSavedQuery(query)
                    
             if self.hostID != "eclipse": 

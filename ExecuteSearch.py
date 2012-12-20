@@ -5,7 +5,7 @@ from splunkConnect import splunkSearch
 from settings import getKeyValue
 
 hostID = grinder.properties["grinder.hostID"]
-if hostID == "nightlyTrend":
+if "prod" in hostID:
     xmlrpc_search_url = getKeyValue("xmlrpc", "url1")
 else:
     xmlrpc_search_url = getKeyValue("xmlrpc", "url0")

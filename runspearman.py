@@ -10,8 +10,8 @@ tagValues = {"councilMemberResult":"councilMemberId", "clientContactResult":"PER
 
 def get_args():
     parser = optparse.OptionParser()
-    parser.add_option("-b", "--beforeFolder", action="store", type="string", dest="beforeFolder", default="nightlyTrend",help="name of folder containing baseline files.")
-    parser.add_option("-c", "--afterFolder", action="store", type="string", dest="afterFolder", default="after", help="name of folder containing change files.")
+    parser.add_option("-b", "--beforeFolder", action="store", type="string", dest="beforeFolder", default="prodNightly",help="name of folder containing baseline files.")
+    parser.add_option("-c", "--afterFolder", action="store", type="string", dest="afterFolder", default="prodDeploy", help="name of folder containing change files.")
     parser.add_option("-l", "--logDir", action="store", type="string", dest="logDir", default="/Users/dgriffis/grinder/MyTests/Search_xmlrpc/log/", help="root log directory.")
     
     return parser
@@ -133,11 +133,11 @@ class Test(TestWithScenarios):
     #print "options are %s" % options
     
     logDir = options.logDir
-    print "logdir is %s" % logDir 
+    #print "logdir is %s" % logDir 
     beforeFolder = options.beforeFolder
-    print "beforeFolder is %s" % beforeFolder 
+    #print "beforeFolder is %s" % beforeFolder 
     afterFolder = options.afterFolder
-    print "afterFolder is %s" % afterFolder 
+    #print "afterFolder is %s" % afterFolder 
     
     scenarios = _buildScenarios( os.path.join(logDir, beforeFolder ))   
       
@@ -165,6 +165,16 @@ if __name__ == '__main__':
     #ranks2= [(219378, 6.0), (510847, 1.0), (489352, 3.0), (215446, 4.0), (166881, 5.0), (418280, 3.0), (256081, 2.0), (248372, 7.0)]
     #print spearman_correlation(ranks1, ranks2)  
     
+    parser = get_args()
+    (options, args) = parser.parse_args()  
+    logDir = options.logDir
+    beforeFolder = options.beforeFolder
+    if "prod" in beforeFolder:
+        jtlFolder = "/Users/Shared/Jenkins/Home/jobs/Search_xmlrpc_runspearman_prod_deploy/workspace/test-reports"
+    else:
+        jtlFolder = "/Users/Shared/Jenkins/Home/jobs/Search_xmlrpc_runspearman_dev_deploy/workspace/test-reports"
+            
     suite = unittest.TestLoader().loadTestsFromTestCase(Test)            
-#    unittest.TextTestRunner(verbosity=2).run(suite)  
-    xmlrunner.XMLTestRunner(output='/Users/Shared/Jenkins/Home/jobs/runspearman/workspace/test-reports').run(suite)
+#    unittest.TextTestRunner(verbosity=2).run(suite)
+  
+    xmlrunner.XMLTestRunner(output=jtlFolder).run(suite)
