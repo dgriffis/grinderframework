@@ -1,13 +1,21 @@
 #!/usr/bin/env python
 import os
+import optparse
 from xml.dom import minidom
 import unittest
 from testscenarios import TestWithScenarios
 import xmlrunner
 
-beforeFolder = '/Users/dgriffis/grinder/MyTests/Search_xmlrpc/log/nightlyTrend'
-afterFolder = '/Users/dgriffis/grinder/MyTests/Search_xmlrpc/log/after'
 tagValues = {"councilMemberResult":"councilMemberId", "clientContactResult":"PERSON_ID"}
+
+def get_args():
+    parser = optparse.OptionParser()
+    parser.add_option("-b", "--beforeFolder", action="store", type="string", dest="beforeFolder", default="nightlyTrend",help="name of folder containing baseline files.")
+    parser.add_option("-c", "--afterFolder", action="store", type="string", dest="afterFolder", default="after", help="name of folder containing change files.")
+    parser.add_option("-l", "--logDir", action="store", type="string", dest="logDir", default="/Users/dgriffis/grinder/MyTests/Search_xmlrpc/log/", help="root log directory.")
+    
+    return parser
+
 
 def _getXMLText(element):
     nodelist = element.childNodes
@@ -66,18 +74,14 @@ def _buildRankArray( cms, tagName ):
         
     return rank
   
-def _getTagItems(results, tagItem):
-  
-    return results[0].getElementsByTagName(tagItem)  
+def _getTagItems(results, tagItem): return results[0].getElementsByTagName(tagItem)  
 
-def _buildRanksArrays(which, testFile):
+def _buildRanksArrays(fileFolder, testFile):
+    #print fileFolder 
     #print testFile
     ranks = [(0,0), (1,1)]
     
-    folder = beforeFolder
-    if which == 2:
-        folder = afterFolder
-    xmldoc = minidom.parse( os.path.join(folder, testFile ) )
+    xmldoc = minidom.parse( os.path.join(fileFolder, testFile ) )
     results = xmldoc.getElementsByTagName("results")
     
     if int(results[0].getAttribute("count"))<2:
@@ -101,7 +105,7 @@ def _buildRanksArrays(which, testFile):
   
     return ranks1
     
-def _buildScenarios(): 
+def _buildScenarios(beforeFolder): 
     
     #scenario =  [('scenariotest1', dict(param='xmlrpcSearch-0-page.xml')),
     #              ('scenariotest2', dict(param='xmlrpcSearch-1-page.xml'))
@@ -117,17 +121,30 @@ def _buildScenarios():
  
 class Test(TestWithScenarios):
     ''' 
-      subclass of TestWithScenarios allows display of the unittest testSpearmanCoefficient()
-      with the filename of the file being tested in Jenkins.
+      subclass of TestWithScenarios allows display in Jenkins of the unit test testSpearmanCoefficient()
+      together with the filename of the file being tested.
     '''  
     ranks1 = []
     ranks2 = []
-    scenarios = _buildScenarios()   
+    
+    parser = get_args()
+    (options, args) = parser.parse_args()
+    #print "arg values are %s" % args
+    #print "options are %s" % options
+    
+    logDir = options.logDir
+    print "logdir is %s" % logDir 
+    beforeFolder = options.beforeFolder
+    print "beforeFolder is %s" % beforeFolder 
+    afterFolder = options.afterFolder
+    print "afterFolder is %s" % afterFolder 
+    
+    scenarios = _buildScenarios( os.path.join(logDir, beforeFolder ))   
       
     def setUp( self ):
         #print 'param=', self.param
-        self.ranks1 = _buildRanksArrays( 1, self.param )
-        self.ranks2 = _buildRanksArrays( 2, self.param )
+        self.ranks1 = _buildRanksArrays( os.path.join(self.logDir, self.beforeFolder ), self.param )
+        self.ranks2 = _buildRanksArrays( os.path.join(self.logDir, self.afterFolder ), self.param )
         
     def tearDown(self):
         pass
@@ -147,7 +164,7 @@ if __name__ == '__main__':
     #ranks1= [(219378, 1.0), (510847, 2.0), (489352, 6.0), (215446, 5.0), (166881, 3.0), (418280, 4.0), (256081, 7.0), (248372, 8.0)]
     #ranks2= [(219378, 6.0), (510847, 1.0), (489352, 3.0), (215446, 4.0), (166881, 5.0), (418280, 3.0), (256081, 2.0), (248372, 7.0)]
     #print spearman_correlation(ranks1, ranks2)  
-
+    
     suite = unittest.TestLoader().loadTestsFromTestCase(Test)            
 #    unittest.TextTestRunner(verbosity=2).run(suite)  
     xmlrunner.XMLTestRunner(output='/Users/Shared/Jenkins/Home/jobs/runspearman/workspace/test-reports').run(suite)
