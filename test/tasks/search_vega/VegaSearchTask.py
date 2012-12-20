@@ -65,7 +65,8 @@ class VegaSearchTask(Task):
             logDir = grinder.properties["grinder.logDirectory"]
             targetFile = logDir+"/query.txt"
             self.myQueryFile = open(targetFile, "w")
-
+            self.myQueryFile.close()
+            
     def initializeTask(self):
         """Initializes Instance Variables for this class. This method will be called by the Scenario object that this task belongs to."""
         
@@ -78,26 +79,31 @@ class VegaSearchTask(Task):
             }
 
     def writeToFile(self, text):
-        filename = "%s-%d-page.xml" % ("xmlrpcSearch",                                      
-                                       grinder.runNumber)
+        #print "Writing query %d" % self.index 
+        
+        filename = "%s-%d-page.xml" % ("xmlrpcSearch", grinder.runNumber)
         logDir = grinder.properties["grinder.logDirectory"]
         targetFile = logDir+"/"+self.hostID+"/"+filename
-        if self.hostID == "eclipse":
-            return        
         #print "Log folder and filename is %s" % logDir+"/"+hostID+"/"+filename
-        try:        
+        try:     
             myFile = open(targetFile, "w")
             s = text.encode('utf-8')
             print >> myFile, s
             myFile.close()
         except Exception, err:
-            sys.stderr.write('ERROR: %s\n' % str(err))  
+            log('ERROR: %s\n' % str(err))  
   
     def writeSavedQuery(self, query):
-        try:        
-            print >> self.myQueryFile, query
+        #print "Saving query %d" % self.index 
+         
+        logDir = grinder.properties["grinder.logDirectory"]
+        targetFile = logDir+"/query.txt"
+        try:   
+            self.myQueryFile = open(targetFile, "a")
+            print >> self.myQueryFile, query.encode('utf-8')
+            self.myQueryFile.close()
         except Exception, err:
-            sys.stderr.write('ERROR: %s\n' % str(err))        
+            log('ERROR: %s\n' % str(err))        
                     
     def getProxy(self, url):
         #log("in getProxy with url: %s" % url)
@@ -173,10 +179,7 @@ class VegaSearchTask(Task):
             if "glgkeynote" in parts[QUERY].decode('utf-8').lower() or parts[QUERY].decode('utf-8').lower() == "technology" or parts[APP_ID] == "IndexSwitch":
                 self.index+=1
                 return
-            
-            if self.hostID == "nightlyTrend":
-                self.writeSavedQuery(query)
-             
+                         
             namedArgs = self.buildArgs(parts[NAMED_ARGUMENTS])
             testRun = self.getProxy(url=self.urlDict["url0"])
             
@@ -202,8 +205,13 @@ class VegaSearchTask(Task):
                                 namedArgs,
                                 {})
 
-            
-            self.writeToFile(result)
+            '''For now - a run other than a nightly will execute queries from the saved query file'''
+            if self.hostID == "nightlyTrend":
+                self.writeSavedQuery(query)
+                   
+            if self.hostID != "eclipse": 
+                self.writeToFile(result)
+                
             self.index+=1
         except:
             print "Service returned an error:", sys.exc_info()[0]
