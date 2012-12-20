@@ -1,15 +1,12 @@
 #!/usr/bin/env python
-import math
+
 import optparse
 import sys
+import os
 
 import unittest
-from xml.dom.minidom import parseString
 from testscenarios import TestWithScenarios
 import xmlrunner
-
-#The only change should be the Qtime - any other change should be investigated
-rspByteWarnAt = 1
 
 def get_args():
     parser = optparse.OptionParser()
@@ -27,9 +24,9 @@ LogHeaders = enum('Thread', 'Run', 'Test', 'Start_time', 'Test_time', 'Errors')
         
     
 def buildArray(logDir, fileName):
-    fileTarget = logDir + fileName
-    print "Target file is %s" % fileTarget
 
+    fileTarget = os.path.join(logDir, fileName)
+    #print "Target file is %s" % fileTarget
     try:
         array = [ line.strip() for line in file(fileTarget) ]
     except Exception, err:
@@ -37,31 +34,7 @@ def buildArray(logDir, fileName):
         sys.exit()
   
     return array    
-
-def compareRow(blRow,chRow):
-    blData = blRow.split(",")
-    chData = chRow.split(",")
-    testNum = blData[LogHeaders.Test]
-    if testNum.strip() == "Test":
-        return
-    
-    #Compare response length
-    if blData[LogHeaders.HTTP_response_length] != chData[LogHeaders.HTTP_response_length]:
-        diffVal = math.fabs(int(blData[LogHeaders.HTTP_response_length])-int(chData[LogHeaders.HTTP_response_length]))
-        if diffVal > rspByteWarnAt:
-            print "Warning::Output data is vastly different for test query %s before value is %s and new run value is %s and should be investigated." % (testNum, blData[LogHeaders.HTTP_response_length], chData[LogHeaders.HTTP_response_length])
-        else:
-            print "Info::Output data is different for test query %s before value is %s and new run value is %s." % (testNum, blData[LogHeaders.HTTP_response_length], chData[LogHeaders.HTTP_response_length])
-    
-    #Flag non-200 response codes 
-    #print chData[LogHeaders.HTTP_response_code]
-    if chData[LogHeaders.HTTP_response_code].strip() != "200":  
-        print "Error::Comparison test query %s returned a questionable http code of %s and should be investigated." % (testNum, chData[LogHeaders.HTTP_response_code])
                
-def runCompare(baselineAr,changeAr):
-    for blLine, chLine in zip(baselineAr, changeAr): 
-        compareRow(blLine, chLine)
-
 def _buildScenarios( numoftests):
     #scenario =  [('Row1', dict(param='1')),
     #             ('Row2', dict(param='2'))
@@ -120,6 +93,6 @@ if __name__ == "__main__":
 
     jtlFolder = "/Users/Shared/Jenkins/Home/jobs/Search_xmlrpc/workspace/test-reports"
     suite = unittest.TestLoader().loadTestsFromTestCase(Test)
-    #unittest.TextTestRunner(verbosity=2).run(suite)
-    xmlrunner.XMLTestRunner(output=jtlFolder).run(suite)
+    unittest.TextTestRunner(verbosity=2).run(suite)
+    #xmlrunner.XMLTestRunner(output=jtlFolder).run(suite)
     
