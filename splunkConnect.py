@@ -22,7 +22,7 @@ def splunkSearch(hostID):
     
     oneshotSearchArgs = Args.create()
     #print "value for hostID is %s" % hostID
-    if hostID == "nightlyTrend":
+    if hostID == "prodNightly":
         oneshotSearchArgs.put("earliest_time", "-23h@h")
         oneshotSearchArgs.put("latest_time",   "now")
     else:      

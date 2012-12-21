@@ -14,11 +14,11 @@ else:
 myScenario = Scenario(("Vega Search"), {"url0":xmlrpc_search_url});
 searchTask = VegaSearchTask.VegaSearchTask()
 
-if hostID == "nightlyTrend":
+if hostID == "prodNightly":
     """ Connect to splunk and get last 24 hours of queries """
     searchFilters = splunkSearch( hostID )
 else:
-    """ Retrieve queries from the nightlyTrend saved query file """
+    """ Retrieve queries from the prodNightly saved query file """
     logDir = grinder.properties["grinder.logDirectory"]
     searchFilters = [ line.strip() for line in file(logDir+"/query.txt") ]
                  

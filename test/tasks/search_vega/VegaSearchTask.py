@@ -61,7 +61,7 @@ class VegaSearchTask(Task):
         self.testRun = ""
         self.nFaults = 0
         self.hostID = grinder.properties["grinder.hostID"]
-        if self.hostID == "nightlyTrend":
+        if self.hostID == "prodNightly":
             logDir = grinder.properties["grinder.logDirectory"]
             targetFile = logDir+"/query.txt"
             self.myQueryFile = open(targetFile, "w")
@@ -161,7 +161,7 @@ class VegaSearchTask(Task):
         try:
             
             myterm = self.getQuery() 
-            if self.hostID == "nightlyTrend":       
+            if self.hostID == "prodNightly":       
                 lines = myterm["_raw"]
                 """ term may contain multiple queries - we just want 1 """
                 query = lines.split("\n")[0]
@@ -204,7 +204,7 @@ class VegaSearchTask(Task):
                                 namedArgs,
                                 {})
 
-            '''runs other than a nightlyTrend will execute queries from the saved query file - create the file here'''
+            '''runs other than a prodNightly will execute queries from the saved query file - create the file here'''
             if self.hostID == "prodNightly":
                 self.writeSavedQuery(query)
                    
