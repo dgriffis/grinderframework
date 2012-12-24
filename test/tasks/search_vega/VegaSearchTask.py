@@ -57,10 +57,14 @@ class VegaSearchTask(Task):
         self.description = "Run a Vega Search"
         self.urlDict = {}
         self.taskId = Task.numberOfTasks
+        '''self.index is used to index into the query array'''
         self.index = 0
+        '''self.query is one based and keeps track of the actual number of the query executed'''
+        self.querynum = 1
         self.testRun = ""
         self.nFaults = 0
         self.hostID = grinder.properties["grinder.hostID"]
+        '''the prod nightly saved query text file is opened for write and initializes the file for later append'''
         if self.hostID == "prodNightly":
             logDir = grinder.properties["grinder.logDirectory"]
             targetFile = logDir+"/query.txt"
@@ -81,7 +85,7 @@ class VegaSearchTask(Task):
     def writeToFile(self, text):
         #print "Writing query %d" % self.index 
         
-        filename = "%s-%d-page.xml" % ("xmlrpcSearch", grinder.runNumber)
+        filename = "%s-%d-page.xml" % ("xmlrpcSearch", self.querynum)
         logDir = grinder.properties["grinder.logDirectory"]
         targetFile = logDir+"/"+self.hostID+"/"+filename
         #print "Log folder and filename is %s" % logDir+"/"+hostID+"/"+filename
@@ -92,7 +96,8 @@ class VegaSearchTask(Task):
             myFile.close()
         except Exception, err:
             log('ERROR: %s\n' % str(err))  
-  
+        self.querynum+=1
+        
     def writeSavedQuery(self, query):
         #print "Saving query %d" % self.index 
          
