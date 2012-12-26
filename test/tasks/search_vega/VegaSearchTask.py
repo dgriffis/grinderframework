@@ -64,7 +64,7 @@ class VegaSearchTask(Task):
         self.testRun = ""
         self.nFaults = 0
         self.hostID = grinder.properties["grinder.hostID"]
-        '''the prod nightly saved query text file is opened for write and initializes the file for later append'''
+        '''the prodNightly saved query text file is opened for write and initializes the file for later append'''
         if self.hostID == "prodNightly":
             logDir = grinder.properties["grinder.logDirectory"]
             targetFile = logDir+"/query.txt"
@@ -96,7 +96,6 @@ class VegaSearchTask(Task):
             myFile.close()
         except Exception, err:
             log('ERROR: %s\n' % str(err))  
-        self.querynum+=1
         
     def writeSavedQuery(self, query):
         #print "Saving query %d" % self.index 
@@ -113,7 +112,7 @@ class VegaSearchTask(Task):
     def getProxy(self, url):
         #log("in getProxy with url: %s" % url)
         try:
-            s = Test(self.index, "xmlrpc search").wrap(ServerProxy(url, None))
+            s = Test(self.querynum, "xmlrpc search").wrap(ServerProxy(url, None))
         except:
             print "Service returned an error:", sys.exc_info()[0]
            
@@ -217,6 +216,7 @@ class VegaSearchTask(Task):
                 self.writeToFile(result)
                 
             self.index+=1
+            self.querynum+=1
         except:
             print "Service returned an error:", sys.exc_info()[0]
             log("fault on query %d with raw string of %s : " % ( self.index, query ))
