@@ -85,7 +85,7 @@ def _buildRanksArrays(fileFolder, testFile):
     xmldoc = minidom.parse( os.path.join(fileFolder, testFile ) )
     results = xmldoc.getElementsByTagName("results")
     
-    '''Should have at least 10 results to be relative'''
+    '''Should have at least 10 results to be relevant'''
     if int(results[0].getAttribute("count"))<10:
         return ranks
     
