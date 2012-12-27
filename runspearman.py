@@ -7,6 +7,8 @@ from testscenarios import TestWithScenarios
 import xmlrunner
 
 tagValues = {"councilMemberResult":"councilMemberId", "clientContactResult":"PERSON_ID"}
+'''values lower than the testBoudary will be flagged as fails'''
+testBoundary = 0.975
 
 def get_args():
     parser = optparse.OptionParser()
@@ -15,7 +17,6 @@ def get_args():
     parser.add_option("-l", "--logDir", action="store", type="string", dest="logDir", default="/Users/dgriffis/grinder/MyTests/Search_xmlrpc/log/", help="root log directory.")
     
     return parser
-
 
 def _getXMLText(element):
     nodelist = element.childNodes
@@ -47,8 +48,8 @@ def _spearman_correlation(ranks1, ranks2):
     present in only one list before ranking)."""
     n = 0
     res = 0
-    #print ranks1
-    #print ranks2
+    #print "ranks1 is",ranks1
+    #print "ranks2 is",ranks2
     ranks1 = sorted(ranks1, key=lambda k: -k[1])
     ranks2 = sorted(ranks2, key=lambda k: -k[1])
 
@@ -84,7 +85,8 @@ def _buildRanksArrays(fileFolder, testFile):
     xmldoc = minidom.parse( os.path.join(fileFolder, testFile ) )
     results = xmldoc.getElementsByTagName("results")
     
-    if int(results[0].getAttribute("count"))<2:
+    '''Should have at least 10 results to be relative'''
+    if int(results[0].getAttribute("count"))<10:
         return ranks
     
     '''search will return results tagged as councilMemberResult or clientContactResult '''
@@ -151,9 +153,11 @@ class Test(TestWithScenarios):
     
     def testSpearmanCoefficient(self):    
         result = _spearman_correlation(self.ranks1, self.ranks2)
-        #print "spearman result is %f" %  result
-        self.assertTrue( result == 1.0 )
-        #print "spearman for file %s is %f" % ( self.param, result )  
+        #if result < 0.975:
+        #    print "spearman for file %s is %f" % ( self.param, result ) 
+        #    print "ranks1 is",self.ranks1
+        #    print "ranks2 is",self.ranks2 
+        self.assertTrue( result >= testBoundary )
     
 if __name__ == '__main__':  
    
@@ -175,6 +179,6 @@ if __name__ == '__main__':
         jtlFolder = "/Users/Shared/Jenkins/Home/jobs/Search_xmlrpc_runspearman_dev_deploy/workspace/test-reports"
             
     suite = unittest.TestLoader().loadTestsFromTestCase(Test)            
-#    unittest.TextTestRunner(verbosity=2).run(suite)
+    #unittest.TextTestRunner(verbosity=2).run(suite)
   
     xmlrunner.XMLTestRunner(output=jtlFolder).run(suite)
