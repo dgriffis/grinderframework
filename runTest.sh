@@ -28,7 +28,7 @@ esac
 
 
 
-echo "Deleteing test output files"
+echo "Delete test output files"
 pushd log/$hostID
 rm *.xml
 popd
